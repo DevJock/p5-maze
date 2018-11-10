@@ -1,7 +1,5 @@
 /**
- * Responsive p5.js Template for quick Prototyping
- * Included with responsive HTML5 Template
- * The default behaviour of this Template is to fill the browser viewport or the container div. 
+ * MAZE 
  * © 2018 Chiraag Bangera.
  */
 
@@ -13,7 +11,7 @@ let canvas;
 let cols;
 let rows;
 
-let size = 100;
+var SIZE = false;
 
 let maze;
 
@@ -26,7 +24,6 @@ function setup() {
     textAlign(CENTER, CENTER);
     rectMode(CENTER);
     textSize(60);
-    frameRate(120);
 }
 
 
@@ -36,33 +33,51 @@ function windowResized() {
     resizeCanvas(w, h);
     Width = canvas.width;
     Height = canvas.height;
-    rows = Math.ceil((Height - size) / size * 2);
-    cols = Math.ceil((Width - size) / size * 2);
-    maze = new MAZE(rows, cols);
-    
+    rows = Math.ceil((Height - SIZE) / SIZE * 2);
+    cols = Math.ceil((Width - SIZE) / SIZE * 2);
+    maze = new MAZE(rows, cols, SIZE);
+    //maze.build();
 }
 
 function draw() {
     background(0);
     if (maze) {
-        maze.buildNext();
         maze.draw();
+        maze.buildNext();
+    }
+}
+
+function newMaze(size,speed=0,r = 0, c = 0) {
+    SIZE = size;
+    if (r === 0) {
+        rows = Math.ceil((Height - SIZE) / SIZE * 2);
     }
 
+    if (c === 0) {
+        cols = Math.ceil((Width - SIZE) / SIZE * 2);
+    }
+    maze = new MAZE(rows, cols, SIZE);
+    if(speed === 0){
+        maze.build();
+    }
+    else{
+        frameRate(speed);
+    }
 }
 
 class MAZE {
-    constructor(rows, cols) {
+    constructor(rows, cols, size) {
         this.rows = rows;
         this.cols = cols;
+        this.size = size;
         this.cells = [];
         this.stack = [];
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
-                this.cells.push(new Cell(i, j, size));
+                this.cells.push(new Cell(i, j, this.size));
             }
         }
-        this.current = this.cells[floor(random(0,this.cells.length))];
+        this.current = this.cells[floor(random(0, this.cells.length))];
         this.current.visited = true;
         this.cellIndex = 0;
     }
@@ -116,6 +131,7 @@ class MAZE {
         if (next) {
             this.removeWalls(next);
             next.visited = true;
+            next.current = true;
             this.stack.push(this.current);
             this.current = next;
         } else if (this.stack.length > 0) {
@@ -159,7 +175,6 @@ class Cell {
         this.size = size;
         this.walls = [true, true, true, true];
         this.visited = false;
-        this.current = false;
     }
 
     makeVisited() {
@@ -168,18 +183,9 @@ class Cell {
         rect(this.x + this.size / 4, this.y + this.size / 4, this.size / 2, this.size / 2);
     }
 
-    makeCurrent() {
-        fill(200, 200, 51);
-        noStroke();
-        rect(this.x + this.size / 4, this.y + this.size / 4, this.size / 2, this.size / 2);
-    }
-
-
     draw() {
         if (DEBUG_MODE) {
-            if (this.current) {
-                this.makeCurrent();
-            } else if (this.visited) {
+            if (this.visited) {
                 this.makeVisited();
             }
             fill(255);
