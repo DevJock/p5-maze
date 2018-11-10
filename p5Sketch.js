@@ -11,11 +11,11 @@ let canvas;
 let cols;
 let rows;
 
-var SIZE = false;
+var SIZE = 100;
 
 let maze;
 
-var DEBUG_MODE = true;
+var DEBUG_MODE = false;
 
 function setup() {
     canvas = createCanvas(Width, Height);
